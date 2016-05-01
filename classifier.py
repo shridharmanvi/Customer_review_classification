@@ -26,7 +26,6 @@ def read_data():
         li = data.lower().strip().split('|')
         #print str(li)
         raw_data[i] = li
-        print raw_data[i]
         i+=1
 
     print 'Read data.. Total number of reviews: ' + str(len(raw_data.keys())) + '\n'
@@ -82,7 +81,6 @@ def build_counts(bag):
         cnts={}
         sentance = bag[cl]
         for word in sentance[0].split(' '):
-            #print word
             try:
                 cnts[word]= cnts[word] + 1
             except KeyError:
@@ -90,6 +88,63 @@ def build_counts(bag):
         probs[cl] = cnts
 
     return probs
+
+def calculate_class_probs(dist):
+    class_probs={}
+    total = 0
+    for k in dist.keys():
+        total+=len(dist[k])
+    # got total number of reviews
+    #next, calculate individual class probabilities (prior probabilities)
+    print total
+    for k in dist.keys():
+        class_probs[k]=float(float(len(dist[k]))/float(total))
+    print 'Class probabilities calculated... \n'
+    return class_probs
+
+
+def classifier(bag,counts,class_probabilities,test):
+    all_prbs=[]
+    for item in test:
+        #For each test item
+        clas = raw_data[item][1]
+        item_probs=[]
+        text_review= raw_data[item][0]
+        #text_review = dataCleanse(text_review) #define function for data cleansing
+        #text_review = stemming(text_review) #define stemming function for a string
+        #text_review = removeStopWords(text_review) #define function for stop words removal
+        for cl in bag.keys():
+            #text_review= raw_data[item][0]
+            #text_review = dataCleanse(text_review) #define function for data cleansing
+            #text_review = stemming(text_review) #define stemming function for a string
+            #text_review = removeStopWords(text_review) #define function for stop words removal
+            word_prob=0.0
+            for word in text_review.split(' '):
+                prob=0.0
+                try:
+                    wrd_cnt_inClass= float(counts[cl][word])
+                except KeyError:
+                    wrd_cnt_inClass=0.0
+                tot_words_inClass=float(len(bag[cl][0].split(' ')))
+                tot_uniq_words_inClass = float(len(counts[cl].keys()))
+                prob = float((wrd_cnt_inClass + 1.0)/(tot_words_inClass + tot_uniq_words_inClass))
+                word_prob+=prob
+            item_probs.append({cl:word_prob})
+            #print 'Total prob for class ' + str(cl) + ' is ' + str(word_prob) + ' and actual class is ' + str(clas)
+        print item_probs
+
+        ####Calculated probabilites for the test item belonging to every class. Next part picks the largest probability value and declares the final class
+
+        max_prob = 0.0
+        predicted_class=0
+        for result in item_probs:
+            r_class=result.keys()[0]
+            r_prob=result[r_class]
+            if(r_prob>max_prob):
+                predicted_class=r_class
+                max_prob = r_prob
+        print str(predicted_class) + ' === '  + str(max_prob)
+
 
 
 if __name__ == "__main__":
@@ -100,10 +155,7 @@ if __name__ == "__main__":
     print 'Data read and class segaregation complete! \n'
     bag = build_bag(dist)
     counts = build_counts(bag)
-    print counts
-    """
-    for clas in counts:
-        print clas
-        print counts[clas]
-        print '/n'
-    """
+    #print len(bag['2'][0].split(' '))
+    class_probabilities = calculate_class_probs(dist)
+    classifier(bag,counts,class_probabilities,test)
+
