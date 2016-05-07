@@ -2,7 +2,7 @@
 
 ### Github repository link:
 * https://github.com/shridharmanvi/Customer_review_classification
-
+* Experementation results have been included as part of the presentation 
 
 ### Data collection - Crawling target site
 
