@@ -1,5 +1,9 @@
 # Customer_review_classification
 
+### Github repository link:
+* https://github.com/shridharmanvi/Customer_review_classification
+
+
 ### Data collection - Crawling target site
 
 * The training data for classifier model is scrapped off the target web page: http://www.burlingtoncoatfactory.com/burlingtoncoatfactory/Default.aspx
