@@ -40,15 +40,23 @@ def read_data():
     print 'Read data.. Total number of reviews: ' + str(len(raw_data.keys())) + '\n'
 
 
-def split_test_training(nu):
+def split_test_training(nu,k):
     #n is the number of items in each split
     data = raw_data.keys()
     n=nu #Number of items in k
     chunks=[data[x:x+n] for x in xrange(0, len(data), n)]
-    test_data =chunks[0]
-    training_data=chunks[1:]
+    test_data =chunks[k]
+    training = []
+    for i in range(0,3):
+        if(i != k):
+            #print 'Here'
+            #print i
+            training.append(chunks[i])
+        else:
+            #print i
+            ashk = 0
     print 'Training and test split complete! \n'
-    return test_data, training_data
+    return test_data, training
 
 
 def build_dist(train):
@@ -164,12 +172,10 @@ def stemming(text):
 
 
 def dataCleanse(text):
-    print text
     text=backslash.sub('',text)
     text=utfremove.sub(' ',text)
     text=''.join(ch for ch in text if ch not in punctuation)# remove punctuation
     text=digitsremove.sub('',text)
-    print text
     return text
 
 
@@ -200,14 +206,17 @@ def computeAccuracy(raw_data, predicted):
 
 if __name__ == "__main__":
     read_data()# reads data and assigns unique Ids to each review
-    test, training = split_test_training(500) #splits data with each fold being 20 and returns training and test IDs
-    dist = build_dist(training)
-    print_stats(dist)
-    print 'Data read and class segaregation complete! \n'
-    bag = build_bag(dist)
-    counts = build_counts(bag)
-    class_probabilities = calculate_class_probs(dist)
-    all_probs=classifier(bag, counts, class_probabilities, test)# Returns final predicted classes for all test points
-    print all_probs
-    print computeAccuracy(raw_data, all_probs)
-
+    accuracies = []
+    for i in range(0,3):
+        print '========================================================================================'
+        test, training = split_test_training(500,i) #splits data with each fold being 20 and returns training and test IDs
+        dist = build_dist(training)
+        print_stats(dist)
+        print 'Data read and class segaregation complete! \n'
+        bag = build_bag(dist)
+        counts = build_counts(bag)
+        class_probabilities = calculate_class_probs(dist)
+        all_probs=classifier(bag, counts, class_probabilities, test)# Returns final predicted classes for all test points
+        #print all_probs
+        accuracies.append(computeAccuracy(raw_data, all_probs))
+    print accuracies
