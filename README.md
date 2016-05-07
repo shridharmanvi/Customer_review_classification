@@ -25,6 +25,13 @@
 ```
 # First install all the dependencies and run the web crawler. Once the data is scraped and downloaded, run the classifier
 python webcrawler.py
+
+# After generating all the csv files for each category. Combine them using the following command
+cat *.csv > training_set.csv
+
+# Run the classifier
+python naiveBayesClassifier.py
+
 ```
 
 ###References:
